@@ -150,6 +150,78 @@
 						</section>
 						<section>
 							<h2>Consumer</h2>
+							<aside class="notes">
+							<ul>
+								<li>High Level Consumer API, SimpleConsumer + Client Re-Design</li>
+							</ul>
+						 </aside>
+						</section>
+						<section>
+							<h3>Grouping</h3>
+							<img width="100%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
+							<small>add reference</small>
+						</section>
+						<section>
+							<h3>Threading</h3>
+							<img width="100%" src="img/Abbildung 8 - ConsumerThreading.png"/>
+							<small>add reference</small>
+						</section>
+						<section>
+							<h3>Consumer Thread Implementation</h3>
+							<pre class="fragment"><code data-trim class="java">
+public void run() {
+    Thread.currentThread().setName(name);
+    ConsumerIterator&lt;String, News&gt; it = messageStream.iterator();
+    while (it.hasNext()) {
+       relayMessage(it.next());
+    }
+}
+							</code></pre>
+							<pre class="fragment"><code data-trim class="java">
+void relayMessage(MessageAndMetadata&lt;String, News&gt; kafkaMessage) {
+    logger.trace("Received message with key '{}'"
+               + " and offset '{}' on partition '{}' for topic '{}'",
+            kafkaMessage.key(), kafkaMessage.offset(),
+            kafkaMessage.partition(), kafkaMessage.topic());
+    messageConsumer.consume(kafkaMessage.message());
+}
+							</code></pre>
+							<pre class="fragment"><code data-trim class="java">
+public interface NewsConsumer&lt;News&gt; {
+    void consume(News message);
+}
+							</code></pre>
+							<aside class="notes">
+							<ul>
+								<li>High Level Consumer API, SimpleConsumer + Client Re-Design</li>
+							</ul>
+						 </aside>
+						</section>
+						<section>
+							<h3>Wiring</h3>
+							<pre><code data-trim class="java">
+Map&lt;String, List&lt;KafkaStream&lt;String, News&gt;&gt;&gt; consumerMap;
+ConsumerConnector consumerConnector = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeper, groupId));
+              </code></pre>
+              <pre><code data-trim class="java">
+consumerMap = consumerConnector.createMessageStreams(
+                topicCountMap, new StringDecoder(null), new NewsDecoder());
+
+List&lt;KafkaStream&lt;String, News&gt;&gt; streams = consumerMap.get(topic);
+              </code></pre>
+              <pre><code data-trim class="java">
+// create fixed size thread pool to launch all the threads
+pool = Executors.newFixedThreadPool(numThreads);
+              </code></pre>
+              <pre><code data-trim class="java">
+// create consumer threads to handle the messages
+int threadNumber = 0;
+for (final KafkaStream stream : streams) {
+    String name = String.format("%s[%s]", consumer.getTopic(), threadNumber++);
+    Runnable runnable = new KafkaConsumerThread(stream, name, consumer);
+    pool.submit(runnable);
+}
+              </code></pre>
 						</section>
 					</section>
 
@@ -162,6 +234,12 @@
 					<section>
 						<section>
 							<h1>Summary</h1>
+						</section>
+						<section>
+							<h2>Outlook</h2>
+						</section>
+						<section>
+							<h2>Ecosystem</h2>
 						</section>
 					</section>
 
