@@ -144,7 +144,7 @@
 					<section>
 						<section data-background="img/examples.jpg">
 							<h1>Example</h1>
-							<small><a href="https://flic.kr/p/mHwYY">Hello World</a> by Bill Bradford - Some rights reserved<a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+							<small><a href="https://flic.kr/p/mHwYY">Hello World</a> by Bill Bradford - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 						</section>
 						<section>
 							<h2>Producer</h2>
@@ -158,12 +158,12 @@
 						 </aside>
 						</section>
 						<section>
-							<h3>Grouping</h3>
+							<h3>Consumer Grouping</h3>
 							<img width="100%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
 							<small>add reference</small>
 						</section>
 						<section>
-							<h3>Threading</h3>
+							<h3>Consumer Threading</h3>
 							<img width="100%" src="img/Abbildung 8 - ConsumerThreading.png"/>
 							<small>add reference</small>
 						</section>
@@ -200,27 +200,32 @@ public interface NewsConsumer&lt;News&gt; {
 						</section>
 						<section>
 							<h3>Wiring</h3>
-							<pre><code data-trim class="java">
-Map&lt;String, List&lt;KafkaStream&lt;String, News&gt;&gt;&gt; consumerMap;
-ConsumerConnector consumerConnector = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeper, groupId));
+							<pre class="fragment"><code data-trim class="java">
+import static kafka.consumer.Consumer.createJavaConsumerConnector;
+
+Properties props = new Properties();
+props.put("zookeeper.connect", zookeeper); // list of ZooKeeper nodes
+props.put("group.id", groupId);            // identifies consumer group
+props.put("offsets.storage", "kafka");     // storage for offsets
+props.put("dual.commit.enabled", "false"); // migration switch
+...
+ConsumerConnector consumerConnector = createJavaConsumerConnector(new ConsumerConfig(props));
               </code></pre>
-              <pre><code data-trim class="java">
+              <pre class="fragment"><code data-trim class="java">
+Map&lt;String, List&lt;KafkaStream&lt;String, News&gt;&gt;&gt; consumerMap;
 consumerMap = consumerConnector.createMessageStreams(
-                topicCountMap, new StringDecoder(null), new NewsDecoder());
+                ImmutableMap.of(topic, numberOfThreads),     // number of streams per topic
+                new StringDecoder(null), new NewsDecoder()); // message key and value decoders
 
 List&lt;KafkaStream&lt;String, News&gt;&gt; streams = consumerMap.get(topic);
               </code></pre>
-              <pre><code data-trim class="java">
+            <pre class="fragment"><code data-trim class="java">
 // create fixed size thread pool to launch all the threads
-pool = Executors.newFixedThreadPool(numThreads);
-              </code></pre>
-              <pre><code data-trim class="java">
+ExecutorService pool = Executors.newFixedThreadPool(numThreads);
 // create consumer threads to handle the messages
-int threadNumber = 0;
 for (final KafkaStream stream : streams) {
-    String name = String.format("%s[%s]", consumer.getTopic(), threadNumber++);
-    Runnable runnable = new KafkaConsumerThread(stream, name, consumer);
-    pool.submit(runnable);
+    String name = String.format("%s[%s]", topic, threadNumber++);
+    pool.submit(new ConsumerThread(stream, name, consumer));
 }
               </code></pre>
 						</section>
@@ -229,7 +234,7 @@ for (final KafkaStream stream : streams) {
 					<section>
 						<section data-background="img/performance.jpg">
 							<h1>Performance</h1>
-							<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved<a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+							<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 						</section>
 					</section>
 					<section>
