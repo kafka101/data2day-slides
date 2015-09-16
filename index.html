@@ -148,10 +148,7 @@
 						<small><a href="https://flic.kr/p/mHwYY">Hello World</a> by Bill Bradford - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 					</section>
 					<section>
-						<h2>Producer</h2>
-					</section>
-					<section>
-						<h2>Java API Usage</h2>
+						<h2>Java Producer</h2>
 						<pre class="fragment"><code data-trim class="java">
 public class News {
     public final UUID id;
@@ -210,25 +207,17 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						</aside>
 					</section>
 					<section>
-						<h2>Consumer</h2>
-						<aside class="notes">
-							<ul>
-								<li>High Level Consumer API, SimpleConsumer + Client Re-Design</li>
-							</ul>
-						</aside>
-					</section>
-					<section>
-						<h3>Consumer Grouping</h3>
+						<h2>Consumer Grouping</h2>
 						<img width="65%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
 						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					</section>
 					<section>
-						<h3>Consumer Threading</h3>
+						<h2>Consumer Threading</h2>
 						<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
 						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
 					</section>
 					<section>
-						<h3>Consumer Thread Implementation</h3>
+						<h2>Java Consumer Thread</h2>
 						<pre class="fragment"><code data-trim class="java">
 public void run() {
 	Thread.currentThread().setName(name);
