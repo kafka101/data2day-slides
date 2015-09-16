@@ -103,12 +103,12 @@
 						</section>
 						<section>
 							<h2>Chaos</h2>
-							<img width="100%" src="img/datapipeline_complex.png"/>
+							<img src="img/datapipeline_complex.png"/>
 							<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 						</section>
 						<section>
 							<h2>Order</h2>
-							<img width="100%" src="img/datapipeline_simple.png"/>
+							<img src="img/datapipeline_simple.png"/>
 							<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 						</section>
 					</section>
@@ -120,12 +120,12 @@
 						</section>
 						<section>
 							<h2>Overview</h2>
-							<img width="100%" src="img/Abbildung 1 - Übersicht.png"/>
+							<img width="65%" src="img/Abbildung 1 - Übersicht.png"/>
 							<small>Topologische Übersicht nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
 						</section>
 						<section>
 							<h2>Topics &amp; Partitions</h2>
-							<img width="100%" src="img/Abbildung 2 - Topic.png"/>
+							<img width="65%" src="img/Abbildung 2 - Topic.png"/>
 							<small>Anatomie eines Topics nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
 						</section>
 						<section>
@@ -136,7 +136,7 @@
 						</section>
 						<section>
 							<h2>Log Compaction</h2>
-							<img width="100%" src="img/Abbildung 3 - LogCompaction.png"/>
+							<img width="65%" src="img/Abbildung 3 - LogCompaction.png"/>
 							<small>Log Compaction nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
 						</section>
 					</section>
@@ -159,12 +159,12 @@
 						</section>
 						<section>
 							<h3>Consumer Grouping</h3>
-							<img width="100%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
+							<img width="65%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
 							<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 38</small>
 						</section>
 						<section>
 							<h3>Consumer Threading</h3>
-							<img width="100%" src="img/Abbildung 8 - ConsumerThreading.png"/>
+							<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
 							<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 41</small>
 						</section>
 						<section>
@@ -236,6 +236,32 @@ for (final KafkaStream stream : streams) {
 							<h1>Performance</h1>
 							<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 						</section>
+						<section>
+							<h2>Why is Kafka so fast?</h2>
+							<h4>Fast Writes:</h4>
+							<ul>
+								<li>linear writes</li>
+								<li>all writes go to OS pagecache</li>
+							</ul>
+							<p/>
+							<h4>Fast Reads:</h4>
+							<ul>
+								<li>linear reads</li>
+								<li>direct data transport from <br>pagecache to socket via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
+							</ul>
+							<p/>
+							<h3>Combined -> Fast! </h3>
+							<p>
+								<small>Detailed background: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a><br/>
+								zero-copy support in Java
+								</small>
+							</p>
+							<aside class="notes">
+								- Durable queues in classic systems can be very slow.
+								- linear writes outperform random writes by far, highly optimized in OS.
+								https://www.ibm.com/developerworks/linux/library/j-zerocopy/
+							</aside>
+						</section>
 					</section>
 					<section>
 						<section>
@@ -273,8 +299,8 @@ for (final KafkaStream stream : streams) {
 				width: 1280,
 				height: 1024,
 				margin: 0.1,
-				minScale: 1,
-				maxScale: 1.3,
+				minScale: 0.8,
+				maxScale: 1.2,
 
 				transition: 'slide', // none/fade/slide/convex/concave/zoom
 
