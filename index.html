@@ -46,6 +46,19 @@
 					<small><a href="https://github.com/frankwis">Frank Wisniewski</a> - <a href="http://twitter.com/ultraknackig">@ultraknackig</a><br>
 						<a href="https://github.com/larsp">Lars Pfannenschmidt</a> - <a href="http://twitter.com/leastangle">@leastangle</a></small>
 					</p>
+					<aside class="notes">
+						<ul>
+							<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
+							<li>Wer hat schon mal mit Kafka gearbeitet?</li>
+							<li>F&uuml;r die, die es nicht wissen. Kafka ist ein...</li>
+							<ul>
+								<li>verteilter</li>
+								<li>partitionierender</li>
+								<li>replizierender</li>
+							</ul>
+							...Service f&uuml;r Datenstr&ouml;me.
+						</ul>
+					</aside>
 				</section>
 
 				<section>
@@ -65,6 +78,10 @@
 						<li>Founder of <a href="https://twitter.com/mobilecgn">@mobilecgn</a> User Group</li>
 						<li><a href="https://twitter.com/leastangle">@leastangle</a></li>
 					</ul>
+
+					<aside class="notes">
+						Hallo, mein Name ist XXX. Mehr zu uns findet ihr auf den Folien.
+					</aside>
 				</section>
 
 				<section>
@@ -80,7 +97,7 @@
 							</ul>
 						</div>
 						<div class="fragment">
-							<li>Sample</li>
+							<li>Example</li>
 							<ul>
 								<li>Producer</li>
 								<li>Consumer</li>
@@ -90,10 +107,9 @@
 						<li class="fragment">Summary</li>
 					</ul>
 					<aside class="notes">
-						<ul>
-							<li>Wer hat schon mal mit Kafka gearbeitet?</li>
-							<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
-						</ul>
+						Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.
+						Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.
+						Performance: Warum ist Kafka in der Lage derartige Datenmengen zu verarbeiten und was ist ggfls. zu beachten.
 					</aside>
 				</section>
 
@@ -128,17 +144,30 @@
 						<h2>Topics &amp; Partitions</h2>
 						<img width="65%" src="img/Abbildung 2 - Topic.png"/>
 						<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+						<aside class="notes">
+							Nachrichten werden Topics in organisiert
+							Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden
+							Pro Partition werden die Message sequentiell weggeschrieben.
+							Offset: Fortlaufende Nummer je Partition.
+							Replikation: Jedes Topic l&auml;sst sich n fach replizieren
+							Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen
+						</aside>
 					</section>
 					<section>
 						<h2>Guarantees</h2>
 						<ul>
-							<li>TBD</li>
+							<li>Messages sent to a particular partition will be appended in the order they are seen</li>
+							<li>Consumer sees messages in the order they are stored in the log</li>
+							<li>Kafka will tolerate up to N-1 server failures for a topic with replication factor N</li>
 						</ul>
 					</section>
 					<section>
 						<h2>Log Compaction</h2>
 						<img width="65%" src="img/Abbildung 3 - LogCompaction.png"/>
 						<small>Log compaction in conformity with <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+						<aside class="notes">
+							Compression nicht m&ouml;glich mit Log Compaction
+						</aside>
 					</section>
 				</section>
 
@@ -172,6 +201,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 }
 						</code></pre>
 						<aside class="notes">
+							Alles was durch Kafka geht, sind Byte-Arrays. Wenn man also in seiner Dom&auml;ne etwas anderes verwenden m&ouml;chte, dann m&uuml;ssen eigene <b>Serializer</b> geschrieben werden ;-)
 						</aside>
 					</section>
 					<section>
@@ -204,6 +234,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 								<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
 								<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
 							</ul>
+							<b>Obacht:</b> Nachtr&auml;gliches &Auml;ndern der Partitionsgr&ouml;ße, re-partiitoniert nicht vorhandene Nachrichten
 						</aside>
 					</section>
 					<section>
@@ -211,6 +242,11 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						<img width="65%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
 						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					</section>
+					<aside class="notes">
+						Strategie zum Konsumieren der Daten.
+						Klassisch: Einstellung auf dem Broker, hier &uuml;ber die Art des Auslesens
+						links queue, rechts publish subscribe
+					</aside>
 					<section>
 						<h2>Consumer Threading</h2>
 						<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
@@ -270,13 +306,16 @@ List&lt;KafkaStream&lt;String, News&gt;&gt; streams = consumerMap.get(topic);
 						</code></pre>
 						<pre class="fragment"><code data-trim class="java">
 // create fixed size thread pool to launch all the threads
-ExecutorService pool = Executors.newFixedThreadPool(numThreads);
+ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
 // create consumer threads to handle the messages
 for (final KafkaStream stream : streams) {
 	String name = String.format("%s[%s]", topic, threadNumber++);
 	pool.submit(new ConsumerThread(stream, name, consumer));
 }
 						</code></pre>
+						<aside class="notes">
+							Anmerkung: Gott sei Dank ist eine neue Java-API in Arbeit!
+						</aside>
 					</section>
 				</section>
 
@@ -287,6 +326,7 @@ for (final KafkaStream stream : streams) {
 					</section>
 					<section>
 						<h2>What makes Kafka fast?</h2>
+						<h4>Designed to make consumption as cheap as possible</h4>
 						<h4>Fast Writes:</h4>
 						<ul>
 							<li>linear writes</li>
@@ -314,6 +354,9 @@ for (final KafkaStream stream : streams) {
 							<h2>sendfile()?</h2>
 							<img width="80%" src="img/traditional data copy vs sendfile.png"/>
 							<small>Efficient data transfer according to  <a href="http://www.ibm.com/developerworks/library/j-zerocopy/">http://www.ibm.com/developerworks/library/j-zerocopy/</a></small>
+							<aside class="notes">
+								In Java sorgt <code>FileChannel.transferTo()</code>, falls es die JVM des OS unterst&uuml;tzt, daf&uuml;r, dass sendfile() benutzt wird.
+							</aside>
 						</section>
 					</section>
 				</section>
@@ -324,7 +367,7 @@ for (final KafkaStream stream : streams) {
 					<section>
 						<h2>Key Features &amp; Facts</h2>
 						<ul>
-							<li class="fragment"><b>Commit Log</b>&emsp;&emsp;Topics, Partitioning, Log Compaction &amp; Offset Management</li>
+							<li class="fragment"><b>Commit Log</b>&emsp;&emsp;Topics, Partitioning, Log Compaction, Compression &amp; Offset Management</li>
 							<li class="fragment"><b>Real-time</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;High-Throughput &amp; Low-Latency</li>
 							<li class="fragment"><b>Persistence</b>&emsp;&emsp;&emsp;Scalable, centralized &amp; replicated storage</li>
 						</ul>
@@ -332,8 +375,8 @@ for (final KafkaStream stream : streams) {
 					<section>
 						<h2>Related</h2>
 						<ul>
-							<li class="fragment"><b>Clients</b>&emsp;&emsp;Scala, Java, Python, Go, REST, Perl, Erlang etc.</li>
-							<li class="fragment"><b>Integration</b>&emsp;&emsp;Storm, Samza, Hadoop, ElasticSearch, Hive, LogStash etc.</li>
+							<li class="fragment"><b>Clients</b>&emsp;&emsp;Scala, Java, Python, Go, Perl, Erlang etc.</li>
+							<li class="fragment"><b>Integration</b>&emsp;&emsp;Storm, Samza, Hadoop, ElasticSearch, Logstash, Hive etc.</li>
 							<li class="fragment"><b>Confluent Platform</b>&emsp;&emsp;Schema Registry, REST Proxy &amp; Camus</li>
 						</ul>
 						<aside class="notes">
