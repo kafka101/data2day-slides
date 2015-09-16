@@ -6,7 +6,7 @@
 
 	<title>Massive Datenströme mit Kafka</title>
 
-	<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+	<meta name="description" content="data2day 2015 - Massive Datenströme mit Kafka">
 	<meta name="author" content="Frank Wisniewski & Lars Pfannenschmidt">
 
 	<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -200,7 +200,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						<aside class="notes">
 							<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
 							<ul>
-								<li>Ohne Key keine <b>Log Compaction</b> m&ouml;glich</li>
+								<li>Ohne Key hat <b>Log Compaction</b> keinen sinnvollen effekt</li>
 								<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
 								<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
 							</ul>
@@ -299,12 +299,10 @@ for (final KafkaStream stream : streams) {
 							<li>direct data transport from <br>pagecache to socket via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
 							<li>Consumer without lag get all<br>messages from pagecache</li>
 						</ul>
-						<p/>
+						<br><br>
 						<h3>Combined -> Fast!</h3>
 						<p>
-							<small>Detailed background: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a><br/>
-								zero-copy support in Java
-							</small>
+							<small>More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a><br/></small>
 						</p>
 						<aside class="notes">
 							- Durable queues in classic systems can be very slow.
@@ -332,10 +330,7 @@ for (final KafkaStream stream : streams) {
 						</ul>
 					</section>
 					<section>
-						<h2>Outlook</h2>
-					</section>
-					<section>
-						<h2>Ecosystem</h2>
+						<h2>Related</h2>
 						<ul>
 							<li class="fragment"><b>Clients</b>&emsp;&emsp;Scala, Java, Python, Go, REST, Perl, Erlang etc.</li>
 							<li class="fragment"><b>Integration</b>&emsp;&emsp;Storm, Samza, Hadoop, ElasticSearch, Hive, LogStash etc.</li>
