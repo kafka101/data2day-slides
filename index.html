@@ -92,7 +92,7 @@
 					<aside class="notes">
 						<ul>
 							<li>Wer hat schon mal mit Kafka gearbeitet?</li>
-							<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit verbrechen wie JMS gearbeitet?</li>
+							<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
 						</aside>
 					</section>
 
@@ -150,6 +150,65 @@
 							<h2>Producer</h2>
 						</section>
 						<section>
+							<h2>Java API Usage</h2>
+							<pre class="fragment"><code data-trim class="java">
+public class News {
+    public final UUID id;
+    public final String author, title, body;
+...
+}
+              </code></pre>
+							<pre class="fragment"><code data-trim class="java">
+Properties config = new Properties();
+config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, broker);
+config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, NewsSerializer.class.getName());
+
+KafkaProducer&lt;String, News&gt; producer = new KafkaProducer&lt;&gt;(config);
+							</code></pre>
+							<pre class="fragment"><code data-trim class="java">
+public RecordMetadata send(News news) throws ExecutionException, InterruptedException {
+    ProducerRecord&lt;String, News&gt; record = new ProducerRecord&lt;&gt;(topic, news.id.toString(), news);
+    Future&lt;RecordMetadata&gt; recordMetadataFuture = this.producer.send(record);
+    return recordMetadataFuture.get();
+}
+							</code></pre>
+							<aside class="notes">
+						 </aside>
+						</section>
+						<section>
+							<h2>Message Distribution</h2>
+							Control and configure message routing via <code>ProducerRecord</code>:<br /><br />
+							<ul>
+								<li class="fragment">
+									Use round-robin to choose target partition
+							    <pre ><code data-trim class="java">
+ProducerRecord(String topic, V value);
+							    </code></pre>
+								</li>
+								<li class="fragment">
+									Assign identic partition using key hash
+							    <pre class="fragment"><code data-trim class="java">
+ProducerRecord(String topic, K key, V value);
+							    </code></pre>
+								</li>
+								<li class="fragment">
+									Specify partition explicitly
+							    <pre class="fragment"><code data-trim class="java">
+ProducerRecord(String topic, Integer partition, K key, V value);
+							    </code></pre>
+								</li>
+							</ul>
+							<aside class="notes">
+								<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
+								<ul>
+									<li>Ohne Key keine <b>Log Compaction</b> m&ouml;glich.</li>
+									<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
+									<li></li>
+								</ul>
+						 </aside>
+						</section>
+						<section>
 							<h2>Consumer</h2>
 							<aside class="notes">
 							<ul>
@@ -158,12 +217,12 @@
 						 </aside>
 						</section>
 						<section>
-							<h3>Consumer Grouping</h3>
+							<h2>Consumer Grouping</h2>
 							<img width="100%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
 							<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 38</small>
 						</section>
 						<section>
-							<h3>Consumer Threading</h3>
+							<h2>Consumer Threading</h2>
 							<img width="100%" src="img/Abbildung 8 - ConsumerThreading.png"/>
 							<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 41</small>
 						</section>
@@ -199,7 +258,7 @@ public interface NewsConsumer&lt;News&gt; {
 						 </aside>
 						</section>
 						<section>
-							<h3>Wiring</h3>
+							<h2>Wiring</h2>
 							<pre class="fragment"><code data-trim class="java">
 import static kafka.consumer.Consumer.createJavaConsumerConnector;
 
