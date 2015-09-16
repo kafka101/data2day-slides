@@ -104,12 +104,12 @@
 					</section>
 					<section>
 						<h2>Chaos</h2>
-						<img src="img/datapipeline_complex.png"/>
+						<img src="img/datapipeline_complex.jpg"/>
 						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					</section>
 					<section>
 						<h2>Order</h2>
-						<img src="img/datapipeline_simple.png"/>
+						<img src="img/datapipeline_simple.jpg"/>
 						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					</section>
 				</section>
@@ -297,7 +297,7 @@ for (final KafkaStream stream : streams) {
 						<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 					</section>
 					<section>
-						<h2>Why is Kafka so fast?</h2>
+						<h2>What makes Kafka fast?</h2>
 						<h4>Fast Writes:</h4>
 						<ul>
 							<li>linear writes</li>
@@ -308,9 +308,10 @@ for (final KafkaStream stream : streams) {
 						<ul>
 							<li>linear reads</li>
 							<li>direct data transport from <br>pagecache to socket via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
+							<li>Consumer without lag get all<br>messages from pagecache</li>
 						</ul>
 						<p/>
-						<h3>Combined -> Fast! </h3>
+						<h3>Combined -> Fast!</h3>
 						<p>
 							<small>Detailed background: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a><br/>
 								zero-copy support in Java
@@ -321,6 +322,12 @@ for (final KafkaStream stream : streams) {
 							- linear writes outperform random writes by far, highly optimized in OS.
 							https://www.ibm.com/developerworks/linux/library/j-zerocopy/
 						</aside>
+						</section>
+						<section>
+							<h2>sendfile()?</h2>
+							<img width="80%" src="img/traditional data copy vs sendfile.png"/>
+							<small>Efficient data transfer according to  <a href="http://www.ibm.com/developerworks/library/j-zerocopy/">http://www.ibm.com/developerworks/library/j-zerocopy/</a></small>
+						</section>
 					</section>
 				</section>
 				<section>
