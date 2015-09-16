@@ -122,12 +122,12 @@
 					<section>
 						<h2>Overview</h2>
 						<img width="65%" src="img/Abbildung 1 - Übersicht.png"/>
-						<small>Topologische Übersicht nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
+						<small>Topological Overview according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 					</section>
 					<section>
 						<h2>Topics &amp; Partitions</h2>
 						<img width="65%" src="img/Abbildung 2 - Topic.png"/>
-						<small>Anatomie eines Topics nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
+						<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 					</section>
 					<section>
 						<h2>Guarantees</h2>
@@ -138,7 +138,7 @@
 					<section>
 						<h2>Log Compaction</h2>
 						<img width="65%" src="img/Abbildung 3 - LogCompaction.png"/>
-						<small>Log Compaction nach <a href="http://kafka.apache.org/documentation.html">Kafka­-Dokumentation</a></small>
+						<small>Log compaction in conformity with <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 					</section>
 				</section>
 
@@ -203,9 +203,9 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						<aside class="notes">
 							<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
 							<ul>
-								<li>Ohne Key keine <b>Log Compaction</b> m&ouml;glich.</li>
+								<li>Ohne Key keine <b>Log Compaction</b> m&ouml;glich</li>
 								<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
-								<li></li>
+								<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
 							</ul>
 						</aside>
 					</section>
@@ -220,12 +220,12 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 					<section>
 						<h3>Consumer Grouping</h3>
 						<img width="65%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
-						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 38</small>
+						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					</section>
 					<section>
 						<h3>Consumer Threading</h3>
 						<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
-						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” von Pfannenschmidt und Wisniewski aus JavaMagazin 08.2015, S. 41</small>
+						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
 					</section>
 					<section>
 						<h3>Consumer Thread Implementation</h3>
