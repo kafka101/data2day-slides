@@ -166,7 +166,7 @@
 					</section>
 					<section>
 						<h2>Topics &amp; Partitions</h2>
-						<img width="65%" src="img/Abbildung 2 - Topic.png"/>
+						<img src="img/Abbildung 2 - Topic.png"/>
 						<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 						<aside class="notes">
 							<ul>
@@ -182,9 +182,9 @@
 					<section>
 						<h2>Guarantees</h2>
 						<ul>
-							<li>Messages sent to a particular partition will be appended in the order they are seen</li>
-							<li>Consumer sees messages in the order they are stored in the log</li>
-							<li>Kafka will tolerate up to N-1 server failures for a topic with replication factor N</li>
+							<li>Messages sent to a partition will be appended in the order they are seen</li>
+							<li>Consumer see messages in the order they are stored in the log</li>
+							<li>Kafka will tolerate up to <code>n-1</code> server failures for a topic with replication factor <code>n</code></li>
 						</ul>
 					</section>
 					<section>
@@ -221,9 +221,9 @@ KafkaProducer&lt;String, News&gt; producer = new KafkaProducer&lt;&gt;(config);
 						</code></pre>
 						<pre class="fragment"><code data-trim class="java">
 public RecordMetadata send(News news) throws ExecutionException, InterruptedException {
-	ProducerRecord&lt;String, News&gt; record = new ProducerRecord&lt;&gt;(topic, news.id.toString(), news);
-	Future&lt;RecordMetadata&gt; recordMetadataFuture = this.producer.send(record);
-	return recordMetadataFuture.get();
+    ProducerRecord&lt;String, News&gt; record = new ProducerRecord&lt;&gt;(topic, news.id.toString(), news);
+    Future&lt;RecordMetadata&gt; recordMetadataFuture = this.producer.send(record);
+    return recordMetadataFuture.get();
 }
 						</code></pre>
 						<aside class="notes">
@@ -232,23 +232,23 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 					</section>
 					<section>
 						<h2>Message Distribution</h2>
-						Control and configure message routing via <code>ProducerRecord</code>:<br /><br />
+						Message routing to target via <code>ProducerRecord</code>:<br /><br />
 						<ul>
 							<li class="fragment">
-								Use round-robin to choose target partition
-								<pre ><code data-trim class="java">
+								Round Robin
+								<pre><code data-trim class="java">
 									ProducerRecord(String topic, V value);
 								</code></pre>
 							</li>
 							<li class="fragment">
-								Assign identic partition using key hash
-								<pre class="fragment"><code data-trim class="java">
+								Via <code>key</code> hash (murmur2)
+								<pre><code data-trim class="java">
 									ProducerRecord(String topic, K key, V value);
 								</code></pre>
 							</li>
-							<li class="fragment">
-								Specify partition explicitly
-								<pre class="fragment"><code data-trim class="java">
+							<li class="fragment" style="width:110%">
+								Via specific partition
+								<pre><code data-trim class="java">
 									ProducerRecord(String topic, Integer partition, K key, V value);
 								</code></pre>
 							</li>
@@ -366,7 +366,10 @@ for (final KafkaStream stream : streams) {
 					</section>
 					<section>
 						<h2>What makes Kafka fast?</h2>
-						<h4>Designed to make consumption as cheap as possible</h4>
+						<blockquote cite="http://kafka.apache.org/documentation.html#maximizingefficiency">"[Designed] to make consumption as cheap as possible"</blockquote>
+					</section>
+					<section>
+						<h2>What makes Kafka fast?</h2>
 						<h4>Fast Writes:</h4>
 						<ul>
 							<li>linear writes</li>
@@ -376,18 +379,20 @@ for (final KafkaStream stream : streams) {
 						<h4>Fast Reads:</h4>
 						<ul>
 							<li>linear reads</li>
-							<li>direct data transport from <br>pagecache to socket via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
-							<li>Consumer without lag get all<br>messages from pagecache</li>
+							<li>direct data transport from <br>pagecache to socket* via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
 						</ul>
 						<br><br>
-						<h3>Combined -> Fast!</h3>
+						<h3>Combined &#8594; Fast!</h3>
 						<p>
-							<small>More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a><br/></small>
+							<small>* Consumer without lag get messages from pagecache!<br/>
+								More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a>
+							</small>
 						</p>
 						<aside class="notes">
 							- Durable queues in classic systems can be very slow.
 							- linear writes outperform random writes by far, highly optimized in OS.
 							https://www.ibm.com/developerworks/linux/library/j-zerocopy/
+							-
 						</aside>
 						</section>
 						<section>
@@ -401,8 +406,9 @@ for (final KafkaStream stream : streams) {
 					</section>
 				</section>
 				<section>
-					<section>
+					<section data-background="img/summary.jpg">
 						<h1>Summary</h1>
+						<small><a href="https://flic.kr/p/ifz6wb">Numbers And Finance</a> by reynermedia - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 					</section>
 					<section>
 						<h2>Key Features &amp; Facts</h2>
@@ -446,11 +452,12 @@ for (final KafkaStream stream : streams) {
 			progress: true,
 			history: true,
 			center: true,
-			width: 1280,
-			height: 1024,
+			width: 1024,
+			height: 768,
 			margin: 0.1,
 			minScale: 0.8,
 			maxScale: 1.2,
+			slideNumber: 'c / t',
 
 			transition: 'slide', // none/fade/slide/convex/concave/zoom
 
