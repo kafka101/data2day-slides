@@ -67,7 +67,7 @@
 					<ul>
 						<li>Real Time Data Products @Intuit</li>
 						<li>Founder of <a href="https://twitter.com/mobilecgn">@mobilecgn</a> User Group</li>
-						<li><a href="https://twitter.com/leastangle">@leastangle</a></li>
+						<li><a href="https://twitter.com/ultraknackig">@ultraknackig</a></li>
 					</ul>
 
 					<p/>
@@ -107,9 +107,11 @@
 						<li class="fragment">Summary</li>
 					</ul>
 					<aside class="notes">
-						Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.
-						Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.
-						Performance: Warum ist Kafka in der Lage derartige Datenmengen zu verarbeiten und was ist ggfls. zu beachten.
+						<ul>
+							<li>Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.</li>
+						  <li>Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.</li>
+						  <li>Performance: Warum ist Kafka in der Lage derartige Datenmengen zu verarbeiten und was ist ggfls. zu beachten.</li>
+						</ul>
 					</aside>
 				</section>
 
@@ -117,16 +119,38 @@
 					<section data-background="img/motivation.jpg">
 						<h1>Motivation</h1>
 						<small><a href="https://flic.kr/p/2k2Ww3">high wire 2</a> by Graeme Maclean - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+						<aside class="notes">
+							<ul>
+								<li>internes Projekt bei LinkedIn</li>
+								<li>einheitliche Plattform für die Abwicklung und Verarbeitung von großen Echtzeit-Datenströmen</li>
+							</ul>
+						</aside>
 					</section>
 					<section>
 						<h2>Chaos</h2>
 						<img src="img/datapipeline_complex.jpg"/>
 						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
+						<aside class="notes">
+							Die Daten zwischen den einzelnen Systemen des internen Data Warehouses wurden direkt ausgetauscht, sodass nicht jedes System mit frischen und akuraten Daten versorgt werden konnte (siehe Abbildung 4).<br />
+							Kernanforderungen:
+							<ol>
+								<li>Kurze Latenz für Echtzeitsysteme</li>
+								<li>Gute Skalierbarkeit für eine große Anzahl an Logs und Events</li>
+								<li>Hohe Fehlertoleranz für sichere Verfügbarkeit kritischer Daten</li>
+							</ol>
+						</aside>
 					</section>
 					<section>
 						<h2>Order</h2>
 						<img src="img/datapipeline_simple.jpg"/>
 						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
+						<aside class="notes">
+							<ul>
+								<li>Topologie für ein entkoppeltes Nachrichtensystem</li>
+								<li><b>Klassisch:</b> “None were built like a modern distributed system that you could safely dump all the data of a growing company into and scale along with your needs.” Jay Kreps, Performance-Einbußen aufgrund von nicht sequentiellen IO-Zugriffen</li>
+								<li>“zentralen Nervensystem” bei LinkedIn</li>
+							</ul>
+						</aside>
 					</section>
 				</section>
 
@@ -145,12 +169,14 @@
 						<img width="65%" src="img/Abbildung 2 - Topic.png"/>
 						<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 						<aside class="notes">
-							Nachrichten werden Topics in organisiert
-							Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden
-							Pro Partition werden die Message sequentiell weggeschrieben.
-							Offset: Fortlaufende Nummer je Partition.
-							Replikation: Jedes Topic l&auml;sst sich n fach replizieren
-							Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen
+							<ul>
+								<li>Nachrichten werden Topics in organisiert</li>
+								<li>Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden</li>
+								<li>Pro Partition werden die Message sequentiell weggeschrieben.</li>
+								<li>Offset: Fortlaufende Nummer je Partition.</li>
+								<li>Replikation: Jedes Topic l&auml;sst sich n fach replizieren</li>
+								<li>Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen</li>
+							</ul>
 						</aside>
 					</section>
 					<section>
@@ -243,14 +269,26 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					</section>
 					<aside class="notes">
-						Strategie zum Konsumieren der Daten.
-						Klassisch: Einstellung auf dem Broker, hier &uuml;ber die Art des Auslesens
-						links queue, rechts publish subscribe
+						<ul>
+							<li>Strategie zum Konsumieren der Daten</li>
+							<li>Klassisch: Einstellung auf dem Broker, hier &uuml;ber die Art des Auslesens</li>
+							<li><b>Queue</b> (links): jede Nachricht wird einzeln vom jeweiligen Empfänger bezogen</li>
+							<li><b>publish-subscribe</b> (rechts): Nachricht als Broadcast von allen</li>
+							<li><b>Topic A:</b>jede Nachricht wird <i>entweder</i> von A0 <i>oder</i> A1 empfangen</li>
+							<li><b>Topic B:</b>Nachricht wird <i>sowohl</i> von B0 <i>als auch</i> von einem Consumer aus Gruppe C empfangen</li>
+						</ul>
 					</aside>
 					<section>
 						<h2>Consumer Threading</h2>
 						<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
 						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
+						<aside class="notes">
+							<ul>
+								<li>Konfiguration zwischen der Anzahl von Threads und Partitionen eines Topics</li>
+								<li>#Threads &gt; #Paritions &rarr; &uuml;bersch&uuml;ssigen Threads erhalten keine Nachrichten (siehe T0)</li>
+								<li>#Threads &lt; #Paritions &rarr; Threads bekommen Nachrichten von mehreren Partitionen &rarr; keine globale Ordnung</li>
+							</ul>
+						</aside>
 					</section>
 					<section>
 						<h2>Java Consumer Thread</h2>
@@ -279,7 +317,9 @@ public interface NewsConsumer&lt;News&gt; {
 						</code></pre>
 						<aside class="notes">
 							<ul>
-								<li>High Level Consumer API, SimpleConsumer + Client Re-Design</li>
+								<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
+								<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
+								<li>Client Re-Design</li>
 							</ul>
 						</aside>
 					</section>
