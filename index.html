@@ -65,8 +65,8 @@
 					<h2>$ whoami</h2>
 					<h4>Frank Wisniewski</h4>
 					<ul>
-						<li>Real Time Data Products @Intuit</li>
-						<li>Founder of <a href="https://twitter.com/mobilecgn">@mobilecgn</a> User Group</li>
+						<li>Futsal playing Engineer @Intuit</li>
+						<li>Event-Driven &amp; Real Time Applications</li>
 						<li><a href="https://twitter.com/ultraknackig">@ultraknackig</a></li>
 					</ul>
 
@@ -123,6 +123,7 @@
 							<ul>
 								<li>internes Projekt bei LinkedIn</li>
 								<li>einheitliche Plattform für die Abwicklung und Verarbeitung von großen Echtzeit-Datenströmen</li>
+								<li>The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds</li>
 							</ul>
 						</aside>
 					</section>
@@ -294,32 +295,32 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						<h2>Java Consumer Thread</h2>
 						<pre class="fragment"><code data-trim class="java">
 public void run() {
-	Thread.currentThread().setName(name);
-	ConsumerIterator&lt;String, News&gt; it = messageStream.iterator();
-	while (it.hasNext()) {
-		relayMessage(it.next());
-	}
+    Thread.currentThread().setName(name);
+    ConsumerIterator&lt;String, News&gt; it = messageStream.iterator();
+    while (it.hasNext()) {
+        relayMessage(it.next());
+    }
 }
 						</code></pre>
 						<pre class="fragment"><code data-trim class="java">
 void relayMessage(MessageAndMetadata&lt;String, News&gt; kafkaMessage) {
     logger.trace("Received message with key '{}'"
-	    + " and offset '{}' on partition '{}' for topic '{}'",
-	    kafkaMessage.key(), kafkaMessage.offset(),
-	    kafkaMessage.partition(), kafkaMessage.topic());
-	messageConsumer.consume(kafkaMessage.message());
+        + " and offset '{}' on partition '{}' for topic '{}'",
+        kafkaMessage.key(), kafkaMessage.offset(),
+        kafkaMessage.partition(), kafkaMessage.topic());
+    messageConsumer.consume(kafkaMessage.message());
 }
 						</code></pre>
 						<pre class="fragment"><code data-trim class="java">
 public interface NewsConsumer&lt;News&gt; {
-	void consume(News message);
+    void consume(News message);
 }
 						</code></pre>
 						<aside class="notes">
 							<ul>
 								<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
 								<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
-								<li>Client Re-Design</li>
+								<li>Client Re-Design ist in Arbeit</li>
 							</ul>
 						</aside>
 					</section>
@@ -349,8 +350,8 @@ List&lt;KafkaStream&lt;String, News&gt;&gt; streams = consumerMap.get(topic);
 ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
 // create consumer threads to handle the messages
 for (final KafkaStream stream : streams) {
-	String name = String.format("%s[%s]", topic, threadNumber++);
-	pool.submit(new ConsumerThread(stream, name, consumer));
+    String name = String.format("%s[%s]", topic, threadNumber++);
+    pool.submit(new ConsumerThread(stream, name, consumer));
 }
 						</code></pre>
 						<aside class="notes">
