@@ -43,232 +43,234 @@
 				<small><h3>data2day 2015</h3></small>
 				<h1>Massive Datenströme mit Kafka</h1>
 				<p>
-					<small><a href="https://github.com/frankwis">Frank Wisniewski</a> - <a href="http://twitter.com/ultraknackig">@ultraknackig</a><br>
-						<a href="https://github.com/larsp">Lars Pfannenschmidt</a> - <a href="http://twitter.com/leastangle">@leastangle</a></small>
-					</p>
+					<small>
+						<a href="https://github.com/frankwis">Frank Wisniewski</a> - <a href="http://twitter.com/ultraknackig">@ultraknackig</a><br/>
+						<a href="https://github.com/larsp">Lars Pfannenschmidt</a> - <a href="http://twitter.com/leastangle">@leastangle</a>
+					</small>
+				</p>
+				<aside class="notes">
+					<ul>
+						<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
+						<li>Wer hat schon mal mit Kafka gearbeitet?</li>
+						<li>F&uuml;r die, die es nicht wissen. Kafka ist ein...</li>
+						<ul>
+							<li>verteilter</li>
+							<li>partitionierender</li>
+							<li>replizierender</li>
+						</ul>
+						...Service f&uuml;r Datenstr&ouml;me.
+					</ul>
+				</aside>
+			</section>
+
+			<section>
+				<h2>$ whoami</h2>
+				<h4>Frank Wisniewski</h4>
+				<ul>
+					<li>Futsal playing Engineer @Intuit</li>
+					<li>Event-Driven &amp; Real Time Applications</li>
+					<li><a href="https://twitter.com/ultraknackig">@ultraknackig</a></li>
+				</ul>
+
+				<p/>
+
+				<h4>Lars Pfannenschmidt</h4>
+				<ul>
+					<li>Real Time Data Products @Intuit</li>
+					<li>Founder of <a href="https://twitter.com/mobilecgn">@mobilecgn</a> User Group</li>
+					<li><a href="https://twitter.com/leastangle">@leastangle</a></li>
+				</ul>
+
+				<aside class="notes">
+					Hallo, mein Name ist XXX. Mehr zu uns findet ihr auf den Folien.
+				</aside>
+			</section>
+
+			<section>
+				<h2>$ ls -al</h2>
+				<ul>
+					<li class="fragment">Motivation</li>
+					<div class="fragment">
+						<li>Concepts</li>
+						<ul>
+							<li>Topics &amp; Partitions</li>
+							<li>Offset Management</li>
+							<li>Log Compaction</li>
+						</ul>
+					</div>
+					<div class="fragment">
+						<li>Example</li>
+						<ul>
+							<li>Producer</li>
+							<li>Consumer</li>
+						</ul>
+					</div>
+					<li class="fragment">Performance</li>
+					<li class="fragment">Summary</li>
+				</ul>
+				<aside class="notes">
+					<ul>
+						<li>Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.</li>
+						<li>Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.</li>
+						<li>Performance: Warum ist Kafka in der Lage derartige Datenmengen zu verarbeiten und was ist ggfls. zu beachten.</li>
+					</ul>
+				</aside>
+			</section>
+
+			<section>
+				<section data-background="img/motivation.jpg">
+					<h1>Motivation</h1>
+					<small><a href="https://flic.kr/p/2k2Ww3">high wire 2</a> by Graeme Maclean - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 					<aside class="notes">
 						<ul>
-							<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
-							<li>Wer hat schon mal mit Kafka gearbeitet?</li>
-							<li>F&uuml;r die, die es nicht wissen. Kafka ist ein...</li>
-							<ul>
-								<li>verteilter</li>
-								<li>partitionierender</li>
-								<li>replizierender</li>
-							</ul>
-							...Service f&uuml;r Datenstr&ouml;me.
+							<li>internes Projekt bei LinkedIn</li>
+							<li>einheitliche Plattform für die Abwicklung und Verarbeitung von großen Echtzeit-Datenströmen</li>
+							<li>The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds</li>
 						</ul>
 					</aside>
 				</section>
-
 				<section>
-					<h2>$ whoami</h2>
-					<h4>Frank Wisniewski</h4>
-					<ul>
-						<li>Futsal playing Engineer @Intuit</li>
-						<li>Event-Driven &amp; Real Time Applications</li>
-						<li><a href="https://twitter.com/ultraknackig">@ultraknackig</a></li>
-					</ul>
-
-					<p/>
-
-					<h4>Lars Pfannenschmidt</h4>
-					<ul>
-						<li>Real Time Data Products @Intuit</li>
-						<li>Founder of <a href="https://twitter.com/mobilecgn">@mobilecgn</a> User Group</li>
-						<li><a href="https://twitter.com/leastangle">@leastangle</a></li>
-					</ul>
-
+					<h2>Chaos</h2>
+					<img src="img/datapipeline_complex.jpg"/>
+					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					<aside class="notes">
-						Hallo, mein Name ist XXX. Mehr zu uns findet ihr auf den Folien.
+						Die Daten zwischen den einzelnen Systemen des internen Data Warehouses wurden direkt ausgetauscht, sodass nicht jedes System mit frischen und akuraten Daten versorgt werden konnte (siehe Abbildung 4).<br />
+						Kernanforderungen:
+						<ol>
+							<li>Kurze Latenz für Echtzeitsysteme</li>
+							<li>Gute Skalierbarkeit für eine große Anzahl an Logs und Events</li>
+							<li>Hohe Fehlertoleranz für sichere Verfügbarkeit kritischer Daten</li>
+						</ol>
 					</aside>
 				</section>
-
 				<section>
-					<h2>$ ls -al</h2>
-					<ul>
-						<li class="fragment">Motivation</li>
-						<div class="fragment">
-							<li>Concepts</li>
-							<ul>
-								<li>Topics &amp; Partitions</li>
-								<li>Offset Management</li>
-								<li>Log Compaction</li>
-							</ul>
-						</div>
-						<div class="fragment">
-							<li>Example</li>
-							<ul>
-								<li>Producer</li>
-								<li>Consumer</li>
-							</ul>
-						</div>
-						<li class="fragment">Performance</li>
-						<li class="fragment">Summary</li>
-					</ul>
+					<h2>Order</h2>
+					<img src="img/datapipeline_simple.jpg"/>
+					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					<aside class="notes">
 						<ul>
-							<li>Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.</li>
-						  <li>Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.</li>
-						  <li>Performance: Warum ist Kafka in der Lage derartige Datenmengen zu verarbeiten und was ist ggfls. zu beachten.</li>
+							<li>Topologie für ein entkoppeltes Nachrichtensystem</li>
+							<li><b>Klassisch:</b> “None were built like a modern distributed system that you could safely dump all the data of a growing company into and scale along with your needs.” Jay Kreps, Performance-Einbußen aufgrund von nicht sequentiellen IO-Zugriffen</li>
+							<li>“zentralen Nervensystem” bei LinkedIn</li>
 						</ul>
 					</aside>
 				</section>
+			</section>
 
-				<section>
-					<section data-background="img/motivation.jpg">
-						<h1>Motivation</h1>
-						<small><a href="https://flic.kr/p/2k2Ww3">high wire 2</a> by Graeme Maclean - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
-						<aside class="notes">
-							<ul>
-								<li>internes Projekt bei LinkedIn</li>
-								<li>einheitliche Plattform für die Abwicklung und Verarbeitung von großen Echtzeit-Datenströmen</li>
-								<li>The original use case for Kafka was to be able to rebuild a user activity tracking pipeline as a set of real-time publish-subscribe feeds</li>
-							</ul>
-						</aside>
-					</section>
-					<section>
-						<h2>Chaos</h2>
-						<img src="img/datapipeline_complex.jpg"/>
-						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
-						<aside class="notes">
-							Die Daten zwischen den einzelnen Systemen des internen Data Warehouses wurden direkt ausgetauscht, sodass nicht jedes System mit frischen und akuraten Daten versorgt werden konnte (siehe Abbildung 4).<br />
-							Kernanforderungen:
-							<ol>
-								<li>Kurze Latenz für Echtzeitsysteme</li>
-								<li>Gute Skalierbarkeit für eine große Anzahl an Logs und Events</li>
-								<li>Hohe Fehlertoleranz für sichere Verfügbarkeit kritischer Daten</li>
-							</ol>
-						</aside>
-					</section>
-					<section>
-						<h2>Order</h2>
-						<img src="img/datapipeline_simple.jpg"/>
-						<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
-						<aside class="notes">
-							<ul>
-								<li>Topologie für ein entkoppeltes Nachrichtensystem</li>
-								<li><b>Klassisch:</b> “None were built like a modern distributed system that you could safely dump all the data of a growing company into and scale along with your needs.” Jay Kreps, Performance-Einbußen aufgrund von nicht sequentiellen IO-Zugriffen</li>
-								<li>“zentralen Nervensystem” bei LinkedIn</li>
-							</ul>
-						</aside>
-					</section>
+			<section>
+				<section data-background="img/concepts.jpg">
+					<h1>Concepts</h1>
+					<small><a href="https://flic.kr/p/iRs3gB">1960 Lloyd Arabella</a> by JOHN LLOYD - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 				</section>
-
 				<section>
-					<section data-background="img/concepts.jpg">
-						<h1>Concepts</h1>
-						<small><a href="https://flic.kr/p/iRs3gB">1960 Lloyd Arabella</a> by JOHN LLOYD - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
-					</section>
-					<section>
-						<h2>Overview</h2>
-						<img width="65%" src="img/Abbildung 1 - Übersicht.png"/>
-						<small>Topological Overview according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
-					</section>
-					<section>
-						<h2>Topics &amp; Partitions</h2>
-						<img src="img/Abbildung 2 - Topic.png"/>
-						<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
-						<aside class="notes">
-							<ul>
-								<li>Nachrichten werden Topics in organisiert</li>
-								<li>Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden</li>
-								<li>Pro Partition werden die Message sequentiell weggeschrieben.</li>
-								<li>Offset: Fortlaufende Nummer je Partition.</li>
-								<li>Replikation: Jedes Topic l&auml;sst sich n fach replizieren</li>
-								<li>Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen</li>
-							</ul>
-						</aside>
-					</section>
-					<section>
-						<h2>Guarantees</h2>
+					<h2>Overview</h2>
+					<img width="65%" src="img/Abbildung 1 - Übersicht.png"/>
+					<small>Topological Overview according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+				</section>
+				<section>
+					<h2>Topics &amp; Partitions</h2>
+					<img src="img/Abbildung 2 - Topic.png"/>
+					<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+					<aside class="notes">
 						<ul>
-							<li>Messages sent to a partition will be appended in the order they are seen</li>
-							<li>Consumer see messages in the order they are stored in the log</li>
-							<li>Kafka will tolerate up to <code>n-1</code> server failures for a topic with replication factor <code>n</code></li>
+							<li>Nachrichten werden Topics in organisiert</li>
+							<li>Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden</li>
+							<li>Pro Partition werden die Message sequentiell weggeschrieben.</li>
+							<li>Offset: Fortlaufende Nummer je Partition.</li>
+							<li>Replikation: Jedes Topic l&auml;sst sich n fach replizieren</li>
+							<li>Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen</li>
 						</ul>
-					</section>
-					<section>
-						<h2>Log Compaction</h2>
-						<img width="65%" src="img/Abbildung 3 - LogCompaction.png"/>
-						<small>Log compaction in conformity with <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
-						<aside class="notes">
-							Compression nicht m&ouml;glich mit Log Compaction
-						</aside>
-					</section>
+					</aside>
 				</section>
-
 				<section>
-					<section data-background="img/examples.jpg">
-						<h1>Example</h1>
-						<small><a href="https://flic.kr/p/mHwYY">Hello World</a> by Bill Bradford - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
-					</section>
-					<section>
-						<h2>Java Producer</h2>
-						<pre class="fragment"><code data-trim class="java">
+					<h2>Guarantees</h2>
+					<ul>
+						<li>Messages sent to a partition will be appended in the order they are seen</li>
+						<li>Consumer see messages in the order they are stored in the log</li>
+						<li>Kafka will tolerate up to <code>n-1</code> server failures for a topic with replication factor <code>n</code></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Log Compaction</h2>
+					<img width="65%" src="img/Abbildung 3 - LogCompaction.png"/>
+					<small>Log compaction according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+					<aside class="notes">
+						Compression nicht m&ouml;glich mit Log Compaction
+					</aside>
+				</section>
+			</section>
+
+			<section>
+				<section data-background="img/examples.jpg">
+					<h1>Example</h1>
+					<small><a href="https://flic.kr/p/mHwYY">Hello World</a> by Bill Bradford - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+				</section>
+				<section>
+					<h2>Java Producer</h2>
+					<pre class="fragment"><code data-trim class="java">
 public class News {
     public final UUID id;
     public final String author, title, body;
 ...
 }
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 Properties config = new Properties();
 config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, broker);
 config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, NewsSerializer.class.getName());
 
 KafkaProducer&lt;String, News&gt; producer = new KafkaProducer&lt;&gt;(config);
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 public RecordMetadata send(News news) throws ExecutionException, InterruptedException {
     ProducerRecord&lt;String, News&gt; record = new ProducerRecord&lt;&gt;(topic, news.id.toString(), news);
     Future&lt;RecordMetadata&gt; recordMetadataFuture = this.producer.send(record);
     return recordMetadataFuture.get();
 }
-						</code></pre>
-						<aside class="notes">
+					</code></pre>
+					<aside class="notes">
 							Alles was durch Kafka geht, sind Byte-Arrays. Wenn man also in seiner Dom&auml;ne etwas anderes verwenden m&ouml;chte, dann m&uuml;ssen eigene <b>Serializer</b> geschrieben werden ;-)
-						</aside>
-					</section>
-					<section>
-						<h2>Message Distribution</h2>
-						Message routing to target via <code>ProducerRecord</code>:<br /><br />
+					</aside>
+				</section>
+
+				<section>
+					<h2>Message Distribution</h2>
+					Message routing to target partition via <code>ProducerRecord</code><br /><br />
+					<ul>
+						<li class="fragment">
+							Round Robin
+							<pre><code data-trim class="java">
+								ProducerRecord(String topic, V value);
+							</code></pre>
+						</li>
+						<li class="fragment">
+							Via <code>key</code> hash (murmur2)
+							<pre><code data-trim class="java">
+								ProducerRecord(String topic, K key, V value);
+							</code></pre>
+						</li>
+						<li class="fragment" style="width:110%">
+							Via specific partition
+							<pre><code data-trim class="java">
+								ProducerRecord(String topic, Integer partition, K key, V value);
+							</code></pre>
+						</li>
+					</ul>
+					<aside class="notes">
+						<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
 						<ul>
-							<li class="fragment">
-								Round Robin
-								<pre><code data-trim class="java">
-									ProducerRecord(String topic, V value);
-								</code></pre>
-							</li>
-							<li class="fragment">
-								Via <code>key</code> hash (murmur2)
-								<pre><code data-trim class="java">
-									ProducerRecord(String topic, K key, V value);
-								</code></pre>
-							</li>
-							<li class="fragment" style="width:110%">
-								Via specific partition
-								<pre><code data-trim class="java">
-									ProducerRecord(String topic, Integer partition, K key, V value);
-								</code></pre>
-							</li>
+							<li>Ohne Key hat <b>Log Compaction</b> keinen sinnvollen effekt</li>
+							<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
+							<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
 						</ul>
-						<aside class="notes">
-							<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
-							<ul>
-								<li>Ohne Key hat <b>Log Compaction</b> keinen sinnvollen effekt</li>
-								<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
-								<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
-							</ul>
-							<b>Obacht:</b> Nachtr&auml;gliches &Auml;ndern der Partitionsgr&ouml;ße, re-partiitoniert nicht vorhandene Nachrichten
-						</aside>
-					</section>
-					<section>
-						<h2>Consumer Grouping</h2>
-						<img width="65%" src="img/Abbildung 6 - ConsumerGrouping.png"/>
-						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
-					</section>
+						<b>Obacht:</b> Nachtr&auml;gliches &Auml;ndern der Partitionsgr&ouml;ße, re-partiitoniert nicht vorhandene Nachrichten
+					</aside>
+				</section>
+				<section>
+					<h2>Consumer Grouping</h2>
+					<img src="img/Abbildung 6 - ConsumerGrouping.png"/>
+					<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					<aside class="notes">
 						<ul>
 							<li>Strategie zum Konsumieren der Daten</li>
@@ -279,21 +281,24 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 							<li><b>Topic B:</b>Nachricht wird <i>sowohl</i> von B0 <i>als auch</i> von einem Consumer aus Gruppe C empfangen</li>
 						</ul>
 					</aside>
-					<section>
-						<h2>Consumer Threading</h2>
-						<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
-						<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
-						<aside class="notes">
-							<ul>
-								<li>Konfiguration zwischen der Anzahl von Threads und Partitionen eines Topics</li>
-								<li>#Threads &gt; #Paritions &rarr; &uuml;bersch&uuml;ssigen Threads erhalten keine Nachrichten (siehe T0)</li>
-								<li>#Threads &lt; #Paritions &rarr; Threads bekommen Nachrichten von mehreren Partitionen &rarr; keine globale Ordnung</li>
-							</ul>
-						</aside>
-					</section>
-					<section>
-						<h2>Java Consumer Thread</h2>
-						<pre class="fragment"><code data-trim class="java">
+				</section>
+
+				<section>
+					<h2>Consumer Threading</h2>
+					<img width="65%" src="img/Abbildung 8 - ConsumerThreading.png"/>
+					<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
+					<aside class="notes">
+						<ul>
+							<li>Konfiguration zwischen der Anzahl von Threads und Partitionen eines Topics</li>
+							<li>#Threads &gt; #Paritions &rarr; &uuml;bersch&uuml;ssigen Threads erhalten keine Nachrichten (siehe T0)</li>
+							<li>#Threads &lt; #Paritions &rarr; Threads bekommen Nachrichten von mehreren Partitionen &rarr; keine globale Ordnung</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Java Consumer Thread</h2>
+					<pre class="fragment"><code data-trim class="java">
 public void run() {
     Thread.currentThread().setName(name);
     ConsumerIterator&lt;String, News&gt; it = messageStream.iterator();
@@ -301,32 +306,33 @@ public void run() {
         relayMessage(it.next());
     }
 }
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 void relayMessage(MessageAndMetadata&lt;String, News&gt; kafkaMessage) {
-    logger.trace("Received message with key '{}'"
-        + " and offset '{}' on partition '{}' for topic '{}'",
+    logger.trace("Received message with key '{}' and offset '{}' "
+        + "on partition '{}' for topic '{}'",
         kafkaMessage.key(), kafkaMessage.offset(),
         kafkaMessage.partition(), kafkaMessage.topic());
     messageConsumer.consume(kafkaMessage.message());
 }
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 public interface NewsConsumer&lt;News&gt; {
     void consume(News message);
 }
-						</code></pre>
-						<aside class="notes">
-							<ul>
-								<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
-								<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
-								<li>Client Re-Design ist in Arbeit</li>
-							</ul>
-						</aside>
-					</section>
-					<section>
-						<h2>Wiring</h2>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<aside class="notes">
+						<ul>
+							<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
+							<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
+							<li>Client Re-Design ist in Arbeit</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<h2>Wiring</h2>
+					<pre class="fragment"><code data-trim class="java">
 import static kafka.consumer.Consumer.createJavaConsumerConnector;
 
 Properties props = new Properties();
@@ -336,16 +342,16 @@ props.put("offsets.storage", "kafka");     // storage for offsets
 props.put("dual.commit.enabled", "false"); // migration switch
 ...
 ConsumerConnector consumerConnector = createJavaConsumerConnector(new ConsumerConfig(props));
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 Map&lt;String, List&lt;KafkaStream&lt;String, News&gt;&gt;&gt; consumerMap;
 consumerMap = consumerConnector.createMessageStreams(
     ImmutableMap.of(topic, numberOfThreads),     // number of streams per topic
     new StringDecoder(null), new NewsDecoder()); // message key and value decoders
 
 List&lt;KafkaStream&lt;String, News&gt;&gt; streams = consumerMap.get(topic);
-						</code></pre>
-						<pre class="fragment"><code data-trim class="java">
+					</code></pre>
+					<pre class="fragment"><code data-trim class="java">
 // create fixed size thread pool to launch all the threads
 ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
 // create consumer threads to handle the messages
@@ -353,127 +359,133 @@ for (final KafkaStream stream : streams) {
     String name = String.format("%s[%s]", topic, threadNumber++);
     pool.submit(new ConsumerThread(stream, name, consumer));
 }
-						</code></pre>
-						<aside class="notes">
-							Anmerkung: Gott sei Dank ist eine neue Java-API in Arbeit!
-						</aside>
-					</section>
+					</code></pre>
+					<aside class="notes">
+						Anmerkung: Gott sei Dank ist eine neue Java-API in Arbeit!
+					</aside>
 				</section>
+			</section>
 
-				<section>
-					<section data-background="img/performance.jpg">
-						<h1>Performance</h1>
-						<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
-					</section>
-					<section>
-						<h2>What makes Kafka fast?</h2>
-						<blockquote cite="http://kafka.apache.org/documentation.html#maximizingefficiency">"[Designed] to make consumption as cheap as possible"</blockquote>
-					</section>
-					<section>
-						<h2>What makes Kafka fast?</h2>
-						<h4>Fast Writes:</h4>
-						<ul>
-							<li>linear writes</li>
-							<li>all writes go to OS pagecache</li>
-						</ul>
-						<p/>
-						<h4>Fast Reads:</h4>
-						<ul>
-							<li>linear reads</li>
-							<li>direct data transport from <br>pagecache to socket* via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
-						</ul>
-						<br><br>
-						<h3>Combined &#8594; Fast!</h3>
-						<p>
-							<small>* Consumer without lag get messages from pagecache!<br/>
-								More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a>
-							</small>
-						</p>
-						<aside class="notes">
-							- Durable queues in classic systems can be very slow.
-							- linear writes outperform random writes by far, highly optimized in OS.
-							https://www.ibm.com/developerworks/linux/library/j-zerocopy/
-							-
-						</aside>
-						</section>
-						<section>
-							<h2>sendfile()?</h2>
-							<img width="80%" src="img/traditional data copy vs sendfile.png"/>
-							<small>Efficient data transfer according to  <a href="http://www.ibm.com/developerworks/library/j-zerocopy/">http://www.ibm.com/developerworks/library/j-zerocopy/</a></small>
-							<aside class="notes">
-								In Java sorgt <code>FileChannel.transferTo()</code>, falls es die JVM des OS unterst&uuml;tzt, daf&uuml;r, dass sendfile() benutzt wird.
-							</aside>
-						</section>
-					</section>
+			<section>
+				<section data-background="img/performance.jpg">
+					<h1>Performance</h1>
+					<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 				</section>
 				<section>
-					<section data-background="img/summary.jpg">
-						<h1>Summary</h1>
-						<small><a href="https://flic.kr/p/ifz6wb">Numbers And Finance</a> by reynermedia - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
-					</section>
-					<section>
-						<h2>Key Features &amp; Facts</h2>
-						<ul>
-							<li class="fragment"><b>Commit Log</b>&emsp;&emsp;Topics, Partitioning, Log Compaction, Compression &amp; Offset Management</li>
-							<li class="fragment"><b>Real-time</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;High-Throughput &amp; Low-Latency</li>
-							<li class="fragment"><b>Persistence</b>&emsp;&emsp;&emsp;Scalable, centralized &amp; replicated storage</li>
-						</ul>
-					</section>
-					<section>
-						<h2>Related</h2>
-						<ul>
-							<li class="fragment"><b>Clients</b>&emsp;&emsp;Scala, Java, Python, Go, Perl, Erlang etc.</li>
-							<li class="fragment"><b>Integration</b>&emsp;&emsp;Storm, Samza, Hadoop, ElasticSearch, Logstash, Hive etc.</li>
-							<li class="fragment"><b>Confluent Platform</b>&emsp;&emsp;Schema Registry, REST Proxy &amp; Camus</li>
-						</ul>
-						<aside class="notes">
-							Integrates with Stream Processing (Storm, Samza), Search (ElasticSearch), Logging und Metrics.
-						</aside>
-					</section>
+					<h2>What makes Kafka fast?</h2>
+					<blockquote cite="http://kafka.apache.org/documentation.html#maximizingefficiency">"[Designed] to make consumption as cheap as possible"</blockquote>
 				</section>
 				<section>
-					<h1>Thank You!</h1>
+					<h2>What makes Kafka fast?</h2>
+					<h4>Fast Writes:</h4>
+					<ul>
+						<li>linear writes</li>
+						<li>all writes go to OS pagecache</li>
+					</ul>
+					<p/>
+					<h4>Fast Reads:</h4>
+					<ul>
+						<li>linear reads</li>
+						<li>direct data transport from <br>pagecache to socket* via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
+					</ul>
+					<br><br>
+					<h3>Combined &#8594; Fast!</h3>
 					<p>
-						<a href="http://datafreaks.io">datanerds.io</a> /
-						<a href="https://github.com/kafka101">github.com/kafka101</a>
+						<small>* Consumer without lag get messages from pagecache!<br/>
+							More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a>
+						</small>
 					</p>
+					<aside class="notes">
+						- Durable queues in classic systems can be very slow.
+						- linear writes outperform random writes by far, highly optimized in OS.
+						https://www.ibm.com/developerworks/linux/library/j-zerocopy/
+						-
+					</aside>
 				</section>
-			</div>
-		</div>
+				<section>
+					<h2>sendfile()?</h2>
+					<img src="img/traditional data copy vs sendfile.png"/>
+					<small>Efficient data transfer according to  <a href="http://www.ibm.com/developerworks/library/j-zerocopy/">http://www.ibm.com/developerworks/library/j-zerocopy/</a></small>
+					<aside class="notes">
+						In Java sorgt <code>FileChannel.transferTo()</code>, falls es die JVM des OS unterst&uuml;tzt, daf&uuml;r, dass sendfile() benutzt wird.
+					</aside>
+				</section>
+			</section>
+		</section>
+		<section>
+			<section data-background="img/summary.jpg">
+				<h1>Summary</h1>
+				<small><a href="https://flic.kr/p/ifz6wb">Numbers And Finance</a> by reynermedia - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+			</section>
+			<section>
+				<h2>Key Features &amp; Facts</h2>
+				<ul>
+					<li class="fragment"><b>Commit Log</b>&emsp;&emsp;Topics, Partitioning, Log Compaction, Compression &amp; Offset Management</li>
+					<li class="fragment"><b>Real-time</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;High-Throughput &amp; Low-Latency</li>
+					<li class="fragment"><b>Persistence</b>&emsp;&emsp;&emsp;Scalable, centralized &amp; replicated storage</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Related</h2>
+				<ul>
+					<li class="fragment"><b>Clients</b>&emsp;&emsp;Scala, Java, Python, Go, Perl, Erlang etc.</li>
+					<li class="fragment"><b>Integration</b>&emsp;&emsp;Storm, Samza, Hadoop, ElasticSearch, Logstash, Hive etc.</li>
+					<li class="fragment"><b>Confluent Platform</b>&emsp;&emsp;Schema Registry, REST Proxy &amp; Camus</li>
+				</ul>
+				<aside class="notes">
+					Integrates with Stream Processing (Storm, Samza), Search (ElasticSearch), Logging und Metrics.
+				</aside>
+			</section>
+		</section>
+		<section>
+			<h1>Thank You!</h1>
+			<p>
+				<a href="http://datanerds.io">datanerds.io</a><br/>
+				<a href="https://github.com/kafka101">github.com/kafka101</a>
+			</p>
+			<p>
+				<small>
+					<a href="https://github.com/frankwis">Frank Wisniewski</a> - <a href="http://twitter.com/ultraknackig">@ultraknackig</a><br/>
+					<a href="https://github.com/larsp">Lars Pfannenschmidt</a> - <a href="http://twitter.com/leastangle">@leastangle</a>
+				</small>
+			</p>
+		</section>
+	</div>
+</div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
 
-		<script>
+<script>
 
-		// Full list of configuration options available at:
-		// https://github.com/hakimel/reveal.js#configuration
-		Reveal.initialize({
-			controls: true,
-			progress: true,
-			history: true,
-			center: true,
-			width: 1024,
-			height: 768,
-			margin: 0.1,
-			minScale: 0.8,
-			maxScale: 1.2,
-			slideNumber: 'c / t',
+// Full list of configuration options available at:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+	controls: true,
+	progress: true,
+	history: true,
+	center: true,
+	width: 1024,
+	height: 768,
+	margin: 0.1,
+	minScale: 0.8,
+	maxScale: 1.2,
+	slideNumber: 'c / t',
 
-			transition: 'slide', // none/fade/slide/convex/concave/zoom
+	transition: 'slide', // none/fade/slide/convex/concave/zoom
 
-			// Optional reveal.js plugins
-			dependencies: [
-				{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-				{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-				{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-				{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
-				{ src: 'plugin/zoom-js/zoom.js', async: true },
-				{ src: 'plugin/notes/notes.js', async: true }
-			]
-		});
+	// Optional reveal.js plugins
+	dependencies: [
+		{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+		{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+		{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+		{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+		{ src: 'plugin/zoom-js/zoom.js', async: true },
+		{ src: 'plugin/notes/notes.js', async: true }
+	]
+});
 
-		</script>
+</script>
 
-	</body>
-	</html>
+</body>
+</html>
