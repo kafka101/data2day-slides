@@ -49,6 +49,7 @@
 					</small>
 				</p>
 				<aside class="notes">
+					Frank
 					<ul>
 						<li>Wer hat schon mal mit andere Message Brokern wie RabbitMQ, ActiveMQ oder vielleicht sogar mit Verbrechen wie JMS gearbeitet?</li>
 						<li>Wer hat schon mal mit Kafka gearbeitet?</li>
@@ -71,7 +72,6 @@
 					<li>Event-Driven &amp; Real Time Applications</li>
 					<li><a href="https://twitter.com/ultraknackig">@ultraknackig</a></li>
 				</ul>
-
 				<p/>
 
 				<h4>Lars Pfannenschmidt</h4>
@@ -82,7 +82,8 @@
 				</ul>
 
 				<aside class="notes">
-					Hallo, mein Name ist XXX. Mehr zu uns findet ihr auf den Folien.
+					Frank &amp; Lars
+					Hallo, wir sind Frank &amp; Lars.
 				</aside>
 			</section>
 
@@ -109,6 +110,7 @@
 					<li class="fragment">Summary</li>
 				</ul>
 				<aside class="notes">
+					Lars
 					<ul>
 						<li>Concepts tauchen in der Agenda auf, weil sie sich grund&auml;tzlich von den klassischen Brokern unterscheiden.</li>
 						<li>Um euch das angewandt n&auml;her zu bringen, haben wir euch ein Anwendungsbeispiel in Java mitgebracht.</li>
@@ -122,6 +124,7 @@
 					<h1>Motivation</h1>
 					<small><a href="https://flic.kr/p/2k2Ww3">high wire 2</a> by Graeme Maclean - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
 					<aside class="notes">
+						Frank
 						<ul>
 							<li>internes Projekt bei LinkedIn</li>
 							<li>einheitliche Plattform für die Abwicklung und Verarbeitung von großen Echtzeit-Datenströmen</li>
@@ -134,7 +137,20 @@
 					<img src="img/datapipeline_complex.jpg"/>
 					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					<aside class="notes">
-						Die Daten zwischen den einzelnen Systemen des internen Data Warehouses wurden direkt ausgetauscht, sodass nicht jedes System mit frischen und akuraten Daten versorgt werden konnte (siehe Abbildung 4).<br />
+						Frank: Die Daten zwischen den einzelnen Systemen des internen Data Warehouses wurden direkt ausgetauscht, sodass nicht jedes System mit frischen und akuraten Daten versorgt werden konnte (siehe Abbildung 4).<br />
+					</aside>
+				</section>
+				<section>
+					<h2>Order</h2>
+					<img src="img/datapipeline_simple.jpg"/>
+					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
+					<aside class="notes">
+						Frank
+						<ul>
+							<li>Topologie für ein entkoppeltes Nachrichtensystem</li>
+							<li>klassischen Lösngen haben nicht funktioniert</li>
+							<li>“zentralen Nervensystem” bei LinkedIn</li>
+						</ul>
 						Kernanforderungen:
 						<ol>
 							<li>Kurze Latenz für Echtzeitsysteme</li>
@@ -143,36 +159,32 @@
 						</ol>
 					</aside>
 				</section>
-				<section>
-					<h2>Order</h2>
-					<img src="img/datapipeline_simple.jpg"/>
-					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
-					<aside class="notes">
-						<ul>
-							<li>Topologie für ein entkoppeltes Nachrichtensystem</li>
-							<li><b>Klassisch:</b> “None were built like a modern distributed system that you could safely dump all the data of a growing company into and scale along with your needs.” Jay Kreps, Performance-Einbußen aufgrund von nicht sequentiellen IO-Zugriffen</li>
-							<li>“zentralen Nervensystem” bei LinkedIn</li>
-						</ul>
-					</aside>
-				</section>
 			</section>
 
 			<section>
 				<section data-background="img/concepts.jpg">
 					<h1>Concepts</h1>
 					<small><a href="https://flic.kr/p/iRs3gB">1960 Lloyd Arabella</a> by JOHN LLOYD - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+					<aside class="notes">
+						Lars
+					</aside>
 				</section>
 				<section>
 					<h2>Overview</h2>
 					<img width="65%" src="img/overview.png"/>
 					<small>Topological Overview according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
+					<aside class="notes">
+						Lars
+					</aside>
 				</section>
 				<section>
 					<h2>Topics &amp; Partitions</h2>
 					<img src="img/topic.png"/>
 					<small>Anatomy of a topic according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 					<aside class="notes">
+						Lars
 						<ul>
+							<li>Jedes Topic ist automatisch durable</li>
 							<li>Nachrichten werden Topics in organisiert</li>
 							<li>Ein Topic n Partitionen (auf unterschiedlichen Knoten) verteilt werden</li>
 							<li>Pro Partition werden die Message sequentiell weggeschrieben.</li>
@@ -180,6 +192,7 @@
 							<li>Replikation: Jedes Topic l&auml;sst sich n fach replizieren</li>
 							<li>Die Verweildauer einer Nachricht l&auml;sst sich &uuml;ber die Retention festlegen</li>
 						</ul>
+						<b>Obacht:</b> Nachtr&auml;gliches &Auml;ndern der Partitionsgr&ouml;ße, re-partiitoniert nicht vorhandene Nachrichten
 					</aside>
 				</section>
 				<section>
@@ -189,13 +202,16 @@
 						<li>Consumer see messages in the order they are stored in the log</li>
 						<li>Kafka will tolerate up to <code>n-1</code> server failures for a topic with replication factor <code>n</code></li>
 					</ul>
+					<aside class="notes">
+						Lars
+					</aside>
 				</section>
 				<section>
 					<h2>Log Compaction</h2>
 					<img width="65%" src="img/log_compaction.png"/>
 					<small>Log compaction according to <a href="http://kafka.apache.org/documentation.html">Kafka documentation</a></small>
 					<aside class="notes">
-						Compression nicht m&ouml;glich mit Log Compaction
+						Lars: Compression nicht m&ouml;glich mit Log Compaction
 					</aside>
 				</section>
 			</section>
@@ -230,7 +246,8 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 }
 					</code></pre>
 					<aside class="notes">
-							Alles was durch Kafka geht, sind Byte-Arrays. Wenn man also in seiner Dom&auml;ne etwas anderes verwenden m&ouml;chte, dann m&uuml;ssen eigene <b>Serializer</b> geschrieben werden ;-)
+						Lars<br>
+						Alles was durch Kafka geht, sind Byte-Arrays. Wenn man also in seiner Dom&auml;ne etwas anderes verwenden m&ouml;chte, dann m&uuml;ssen eigene <b>Serializer</b> geschrieben werden ;-)
 					</aside>
 				</section>
 
@@ -258,13 +275,13 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 						</li>
 					</ul>
 					<aside class="notes">
+						Lars<br>
 						<b>Erinnerung:</b> Reihenfolge wird pro Partititon garantiert
 						<ul>
 							<li>Ohne Key hat <b>Log Compaction</b> keinen sinnvollen effekt</li>
 							<li>Objekte mit gleichem <b>Key</b> landen <i>immer</i> in gleicher Partition &rarr; Garantie f&uuml;r Reihenfolge (bspw. f&uuml;r Event-Streams)</li>
 							<li>Partitionierung an Hand von anderem Merkmal bzw. Identifer als dem Record-Key m&ouml;glich &rarr; Log-Compaction und Verteilung &uuml;ber seperate Keys</li>
 						</ul>
-						<b>Obacht:</b> Nachtr&auml;gliches &Auml;ndern der Partitionsgr&ouml;ße, re-partiitoniert nicht vorhandene Nachrichten
 					</aside>
 				</section>
 				<section>
@@ -272,6 +289,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 					<img src="img/consumer_grouping.png"/>
 					<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 38</small>
 					<aside class="notes">
+						Frank
 						<ul>
 							<li>Strategie zum Konsumieren der Daten</li>
 							<li>Klassisch: Einstellung auf dem Broker, hier &uuml;ber die Art des Auslesens</li>
@@ -288,6 +306,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 					<img width="65%" src="img/consumer_threading.png"/>
 					<small>“Kafka 101 - Massive Datenströme mit Apache Kafka” by Pfannenschmidt and Wisniewski, JavaMagazin 08.2015, p. 41</small>
 					<aside class="notes">
+						Frank
 						<ul>
 							<li>Konfiguration zwischen der Anzahl von Threads und Partitionen eines Topics</li>
 							<li>#Threads &gt; #Paritions &rarr; &uuml;bersch&uuml;ssigen Threads erhalten keine Nachrichten (siehe T0)</li>
@@ -322,6 +341,7 @@ public interface NewsConsumer&lt;News&gt; {
 }
 					</code></pre>
 					<aside class="notes">
+						Frank
 						<ul>
 							<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
 							<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
@@ -362,6 +382,7 @@ for (final KafkaStream stream : streams) {
 					</code></pre>
 					<small class="fragment">Full Code Example: <a href="https://github.com/kafka101/java-news-feed">https://github.com/kafka101/java-news-feed</a></small>
 					<aside class="notes">
+						Frank<br>
 						Anmerkung: Gott sei Dank ist eine neue Java-API in Arbeit!
 					</aside>
 				</section>
@@ -371,10 +392,16 @@ for (final KafkaStream stream : streams) {
 				<section data-background="img/performance.jpg">
 					<h1>Performance</h1>
 					<small><a href="https://flic.kr/p/wQgqtx">Grefsenkollen Downhill 2015</a> by Vegar Nilsen - Some rights reserved <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a></small>
+					<aside class="notes">
+						Lars
+					</aside>
 				</section>
 				<section>
 					<h2>What makes Kafka fast?</h2>
 					<blockquote cite="http://kafka.apache.org/documentation.html#maximizingefficiency">"[Designed] to make consumption as cheap as possible"</blockquote>
+					<aside class="notes">
+						Lars
+					</aside>
 				</section>
 				<section>
 					<h2>What makes Kafka fast?</h2>
@@ -397,6 +424,7 @@ for (final KafkaStream stream : streams) {
 						</small>
 					</p>
 					<aside class="notes">
+						Lars<br>
 						- Durable queues in classic systems can be very slow.
 						- linear writes outperform random writes by far, highly optimized in OS.
 						https://www.ibm.com/developerworks/linux/library/j-zerocopy/
@@ -408,6 +436,7 @@ for (final KafkaStream stream : streams) {
 					<img src="img/traditional data copy vs sendfile.png"/>
 					<small>Efficient data transfer according to  <a href="http://www.ibm.com/developerworks/library/j-zerocopy/">http://www.ibm.com/developerworks/library/j-zerocopy/</a></small>
 					<aside class="notes">
+						Lars<br>
 						In Java sorgt <code>FileChannel.transferTo()</code>, falls es die JVM des OS unterst&uuml;tzt, daf&uuml;r, dass sendfile() benutzt wird.
 					</aside>
 				</section>
@@ -425,6 +454,9 @@ for (final KafkaStream stream : streams) {
 					<li class="fragment"><b>Real-time</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;High-Throughput &amp; Low-Latency</li>
 					<li class="fragment"><b>Persistence</b>&emsp;&emsp;&emsp;Scalable, centralized &amp; replicated storage</li>
 				</ul>
+				<aside class="notes">
+					Frank
+				</aside>
 			</section>
 			<section>
 				<h2>Related</h2>
@@ -434,6 +466,7 @@ for (final KafkaStream stream : streams) {
 					<li class="fragment"><b>Confluent Platform</b>&emsp;&emsp;Schema Registry, REST Proxy &amp; Camus</li>
 				</ul>
 				<aside class="notes">
+					Frank<br>
 					Integrates with Stream Processing (Storm, Samza), Search (ElasticSearch), Logging und Metrics.
 				</aside>
 			</section>
@@ -487,6 +520,15 @@ Reveal.initialize({
 });
 
 </script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+  ga('create', 'UA-67830207-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
 </body>
 </html>
