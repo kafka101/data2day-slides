@@ -109,7 +109,7 @@
 					<img src="img/datapipeline_complex.jpg"/>
 					<small><a href="http://linkd.in/199iMwY">„The Log: What every software engineer should know about real­time data's unifying abstraction“</a> by Jay Kreps</small>
 					<aside class="notes">
-						uni-/bidirektionale Abhaenigkeiten kreuz und quer; Unwartbar
+						uni-/bidirektionale Abhaenigkeiten (Daten) kreuz und quer; Unwartbar
 					</aside>
 				</section>
 				<section>
@@ -190,6 +190,7 @@ public RecordMetadata send(News news) throws ExecutionException, InterruptedExce
 }
 					</code></pre>
 					<aside class="notes">
+						SourceCode zu klein? Folien bereitgestellt!<br>
 						Kafka &rarr; byte[]<br> Domäne benötigt eigene <b>De-/Serializer</b>
 					</aside>
 				</section>
@@ -272,11 +273,6 @@ public interface NewsConsumer&lt;News&gt; {
 }
 					</code></pre>
 					<aside class="notes">
-						<ul>
-							<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
-							<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
-							<li>Client Re-Design ist in Arbeit</li>
-						</ul>
 					</aside>
 				</section>
 
@@ -312,6 +308,11 @@ for (final KafkaStream stream : streams) {
 					</code></pre>
 					<small class="fragment">Full Code Example: <a href="https://github.com/kafka101/java-news-feed">https://github.com/kafka101/java-news-feed</a></small>
 					<aside class="notes">
+						<ul>
+							<li><b>High Level Consumer API</b> lagert das Verwalten des Offset nach ZooKeeper oder Kafka aus</li>
+							<li><b>SimpleConsumer</b> &uuml;berl&auml;sst dies der Consumer-Implementierung</li>
+							<li>Client Re-Design ist in Arbeit</li>
+						</ul>
 						Gott sei Dank ist eine neue Java-API in Arbeit!
 					</aside>
 				</section>
@@ -333,24 +334,30 @@ for (final KafkaStream stream : streams) {
 				</section>
 				<section>
 					<h2>What makes Kafka fast?</h2>
+					<div class="fragment">
 					<h4>Fast Writes:</h4>
 					<ul>
 						<li>linear writes</li>
 						<li>all writes go to OS pagecache</li>
 					</ul>
 					<p/>
+					</div>
+					<div class="fragment">
 					<h4>Fast Reads:</h4>
 					<ul>
 						<li>linear reads</li>
 						<li>direct data transport from <br>pagecache to socket* via <code><a href="http://man7.org/linux/man-pages/man2/sendfile.2.html" target="blank">sendfile()</a></code></li>
 					</ul>
 					<br><br>
+					</div>
+					<div class="fragment">
 					<h3>Combined &#8594; Fast!</h3>
 					<p>
 						<small>* Consumer without lag get messages from pagecache!<br/>
 							More Details: <a href="http://kafka.apache.org/documentation.html#persistence" target="_blank">http://kafka.apache.org/documentation.html#persistence</a>
 						</small>
 					</p>
+					</div>
 					<aside class="notes">
 						Durable queues bei den klassikern "langsam"<br>
 						linear writes outperform random writes by far!<br>
